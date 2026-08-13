@@ -74,6 +74,9 @@ python test_sigma.py
 
 ## 📸 Real output
 
+**Terminal screenshot — `python test_yara.py && python test_sigma.py`:**
+![Terminal output of both test suites](terminal_output.png)
+
 **`python test_yara.py`:**
 
 ```
