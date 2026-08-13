@@ -1,0 +1,35 @@
+title: Registry Run Key Pointing to a User-Writable Path
+id: 4b8e2d6a-1f9c-4d7e-a3b5-6c8f2e9a4d7b
+status: experimental
+description: |
+    Detects a new Registry Run/RunOnce autostart value whose data points to
+    a user-writable path (%TEMP%, %APPDATA%, %ProgramData%). Legitimate
+    autostart entries almost always point to Program Files or a signed
+    vendor install path -- persistence in a user-writable directory is a
+    strong indicator of a dropped payload, not a normal application.
+author: Aurelio Avila
+date: 2026-08-13
+references:
+    - https://attack.mitre.org/techniques/T1547/001/
+tags:
+    - attack.persistence
+    - attack.t1547.001
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_key:
+        TargetObject|contains:
+            - '\CurrentVersion\Run\'
+            - '\CurrentVersion\RunOnce\'
+    selection_path:
+        Details|contains:
+            - '\AppData\Local\Temp\'
+            - '\AppData\Roaming\'
+            - '\ProgramData\'
+    condition: selection_key and selection_path
+falsepositives:
+    - Some legitimate updater/helper tools install into AppData by design
+      (e.g. some Electron apps) -- baseline known-good vendor paths before
+      enabling this at high severity in a real environment.
+level: high

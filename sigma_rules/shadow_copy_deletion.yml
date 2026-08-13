@@ -1,0 +1,38 @@
+title: Shadow Copy or Backup Catalog Deletion
+id: 9f3a7b1e-5c2d-4a8f-b6e1-7d4c9a2f8e5b
+status: stable
+description: |
+    Detects vssadmin, wbadmin or bcdedit being used to delete shadow copies
+    or the Windows Server Backup catalog, or to disable recovery options.
+    This is one of the very few commands with essentially no legitimate
+    automated/unattended use case on a standard endpoint -- it should
+    trigger an unconditional critical alert, not be tuned out as noise.
+author: Aurelio Avila
+date: 2026-08-13
+references:
+    - https://attack.mitre.org/techniques/T1490/
+tags:
+    - attack.impact
+    - attack.t1490
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_image:
+        Image|endswith:
+            - '\vssadmin.exe'
+            - '\wbadmin.exe'
+            - '\bcdedit.exe'
+    selection_action:
+        CommandLine|contains:
+            - 'delete shadows'
+            - 'delete catalog'
+            - 'resize shadowstorage'
+            - 'recoveryenabled no'
+            - 'bootstatuspolicy ignoreallfailures'
+    condition: selection_image and selection_action
+falsepositives:
+    - Legitimate backup software cleanup jobs -- should be allow-listed by
+      specific parent process and scheduled task name, not by disabling
+      this rule.
+level: critical

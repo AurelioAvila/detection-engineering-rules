@@ -1,0 +1,40 @@
+title: Office Application Spawning Encoded PowerShell
+id: 7c1e4f2a-3b8d-4e6f-9a1c-2d5e8f7a9b3c
+status: experimental
+description: |
+    Detects an Office application (Word, Excel, PowerPoint, Outlook) spawning
+    PowerShell with an encoded command flag. This exact parent/child pairing
+    combined with -EncodedCommand has almost no legitimate use case and is
+    one of the highest-confidence precursors to a macro-delivered payload.
+author: Aurelio Avila
+date: 2026-08-13
+references:
+    - https://attack.mitre.org/techniques/T1566/001/
+    - https://attack.mitre.org/techniques/T1059/001/
+tags:
+    - attack.initial_access
+    - attack.t1566.001
+    - attack.execution
+    - attack.t1059.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\WINWORD.EXE'
+            - '\EXCEL.EXE'
+            - '\POWERPNT.EXE'
+            - '\OUTLOOK.EXE'
+    selection_child:
+        Image|endswith: '\powershell.exe'
+    selection_encoded:
+        CommandLine|contains:
+            - '-EncodedCommand'
+            - '-enc '
+            - '-e '
+    condition: selection_parent and selection_child and selection_encoded
+falsepositives:
+    - Unknown. Legitimate use of this exact combination is not expected in
+      standard enterprise environments.
+level: critical
