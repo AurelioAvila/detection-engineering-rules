@@ -1,5 +1,7 @@
 # Detection Engineering Rules — YARA + Sigma
 
+[![CI](https://github.com/AurelioAvila/detection-engineering-rules/actions/workflows/ci.yml/badge.svg)](https://github.com/AurelioAvila/detection-engineering-rules/actions/workflows/ci.yml)
+
 Written detection rules — YARA for file/content matching, Sigma for
 log-based SIEM detection — each one validated against real positive and
 negative test cases, not just checked for valid syntax.
