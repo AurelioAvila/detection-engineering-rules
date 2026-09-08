@@ -2,14 +2,15 @@
 
 [![CI](https://github.com/AurelioAvila/detection-engineering-rules/actions/workflows/ci.yml/badge.svg)](https://github.com/AurelioAvila/detection-engineering-rules/actions/workflows/ci.yml)
 
-Written detection rules — YARA for file/content matching, Sigma for
-log-based SIEM detection — each one validated against real positive and
-negative test cases, not just checked for valid syntax.
+YARA rules for file/content matching and Sigma rules for log-based SIEM
+detection, with MITRE ATT&CK mapping and automated positive and negative
+tests using synthetic fixtures and the standard EICAR test string.
 
-> **Note:** This is a home-lab portfolio project. Test samples are
-> synthetically generated (see [`generate_test_samples.py`](generate_test_samples.py)
-> and [`test_log_events.py`](test_log_events.py) for exactly what "synthetic" means
-> here and why).
+> **Note:** This is a home-lab portfolio project. The test corpus contains
+> synthetic text samples, synthetic Windows log events and the EICAR test
+> string, not real malware samples or captured incident telemetry. See
+> [`generate_test_samples.py`](generate_test_samples.py) and
+> [`test_log_events.py`](test_log_events.py) for the fixtures.
 
 ---
 
@@ -19,10 +20,10 @@ A detection rule that compiles is not a detection rule that works. It can
 still miss the exact case it was written for (false negative) or fire on
 every normal file/event on the network (false positive) — and neither
 failure shows up until it's already in production. Every rule in this repo
-ships with an automated test proving both:
+ships with automated checks of both outcomes on the included fixtures:
 
-- **True positive:** the rule fires on the exact behavior it targets
-- **True negative:** the rule stays silent on realistic benign activity
+- **Positive case:** the rule matches its intended synthetic pattern or EICAR signature
+- **Negative case:** the rule stays silent on the included benign fixtures
 
 That's the actual deliverable here — not the rules themselves, but the
 harness that keeps them honest.
@@ -78,6 +79,10 @@ python test_sigma.py
 
 **Terminal screenshot — `python test_yara.py && python test_sigma.py`:**
 ![Terminal output of both test suites](terminal_output.png)
+
+The output below comes from fixture tests. Labels such as "malicious samples"
+refer to synthetic malicious-pattern text and EICAR; "zero false positives"
+applies only to the included benign fixtures, not to production detection rates.
 
 **`python test_yara.py`:**
 
@@ -154,6 +159,12 @@ for the full explanation.
 
 ## Limitations
 
+- No real malware corpus or captured incident telemetry is tested here.
+  Passing these fixtures does not establish detection coverage or accuracy
+  on unseen files or production logs.
+- Sigma queries are converted to Splunk SPL, but the suite does not execute
+  them in Splunk. Logic checks use the local matcher, so backend execution,
+  field mapping and production log ingestion remain unvalidated.
 - **`rule_matcher.py` is intentionally narrow**, not a general Sigma
   execution engine — it supports exactly what the 3 rules here use
   (`|endswith`, `|contains` modifiers, AND-of-selections conditions). A
