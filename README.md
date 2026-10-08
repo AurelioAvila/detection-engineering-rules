@@ -78,7 +78,7 @@ python test_sigma.py
 ## 📸 Real output
 
 **Terminal screenshot — `python test_yara.py && python test_sigma.py`:**
-![Terminal output of both test suites](terminal_output.png)
+![Terminal output of both test suites](docs/screenshots/terminal_output.png)
 
 The output below comes from fixture tests. Labels such as "malicious samples"
 refer to synthetic malicious-pattern text and EICAR; "zero false positives"
